@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>To-Do — Categories, Deadlines, Priority</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <header class="topbar">
+      <h1>To-Do</h1>
+
+      <div class="controls">
+        <!-- View switch -->
+        <div class="seg">
+          <button id="view-list" class="seg-btn active">List</button>
+          <button id="view-cal" class="seg-btn">Calendar</button>
+        </div>
+
+        <!-- List view controls -->
+        <input id="q" class="search" placeholder="Search tasks… (title, notes, category)" autocomplete="off">
+        <select id="filter-status" title="Status">
+          <option value="all">All</option>
+          <option value="active">Active</option>
+          <option value="done">Completed</option>
+          <option value="overdue">Overdue</option>
+        </select>
+        <select id="filter-cat" title="Category">
+          <option value="all">All categories</option>
+        </select>
+        <select id="sort" title="Sort">
+          <option value="due_asc">Due ↑</option>
+          <option value="due_desc">Due ↓</option>
+          <option value="priority_desc">Priority ↓</option>
+          <option value="priority_asc">Priority ↑</option>
+          <option value="alpha_asc">A → Z</option>
+          <option value="alpha_desc">Z → A</option>
+          <option value="created_desc">Newest</option>
+          <option value="created_asc">Oldest</option>
+        </select>
+        <button id="export" type="button">Export</button>
+        <button id="import">Import</button>
+        <input id="import-file" type="file" accept="application/json" hidden>
+        <button id="clear-done">Clear Completed</button>
+      </div>
+    </header>
+
+    <!-- New task (shared) -->
+    <form id="new-form" class="new-form" autocomplete="off">
+      <input id="title" placeholder="Task title" required>
+      <input id="due" type="date" title="Due date">
+      <select id="priority" title="Priority">
+        <option value="3">Low</option>
+        <option value="2" selected>Medium</option>
+        <option value="1">High</option>
+      </select>
+      <input id="category" placeholder="Category (e.g., School, Work, Home)">
+      <input id="notes" placeholder="Notes (optional)">
+      <button>Add</button>
+    </form>
+
+    <!-- LIST VIEW -->
+    <section id="list-view">
+      <section id="list" class="list"></section>
+      <footer class="summary" id="summary"></footer>
+    </section>
+
+    <!-- CALENDAR VIEW -->
+    <section id="cal-view" class="hidden">
+      <div class="cal-header">
+        <div class="cal-left">
+          <button id="cal-prev" class="sm">&larr;</button>
+          <button id="cal-today" class="sm">Today</button>
+          <button id="cal-next" class="sm">&rarr;</button>
+        </div>
+        <h2 id="cal-title" class="cal-title">Month YYYY</h2>
+        <div class="cal-right">
+          <span id="cal-hint" class="muted">Tip: click a date to pre-fill “Due” above.</span>
+        </div>
+      </div>
+
+      <div class="cal-grid" id="cal-grid" aria-label="Monthly calendar">
+        <!-- Weekday header -->
+        <div class="cal-head">Sun</div><div class="cal-head">Mon</div><div class="cal-head">Tue</div>
+        <div class="cal-head">Wed</div><div class="cal-head">Thu</div><div class="cal-head">Fri</div><div class="cal-head">Sat</div>
+        <!-- Days injected by JS -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Templates -->
+  <template id="item-tmpl">
+    <article class="item" data-id="">
+      <label class="left">
+        <input type="checkbox" data-action="toggle">
+        <div class="content">
+          <div class="row1">
+            <span class="title"></span>
+            <span class="badge cat"></span>
+            <span class="badge prio"></span>
+          </div>
+          <div class="row2">
+            <span class="due"></span>
+            <span class="notes"></span>
+          </div>
+        </div>
+      </label>
+      <div class="right">
+        <button class="sm" data-action="edit">Edit</button>
+        <button class="sm danger" data-action="delete">Delete</button>
+      </div>
+    </article>
+  </template>
+
+  <template id="edit-tmpl">
+    <div class="editing">
+      <input data-role="title" placeholder="Task title">
+      <input data-role="due" type="date">
+      <select data-role="priority">
+        <option value="3">Low</option>
+        <option value="2">Medium</option>
+        <option value="1">High</option>
+      </select>
+      <input data-role="category" placeholder="Category">
+      <input data-role="notes" placeholder="Notes">
+      <button class="sm" data-action="save-edit">Save</button>
+      <button class="sm danger" data-action="cancel-edit">Cancel</button>
+    </div>
+  </template>
+
+  <script src="script.js"></script>
+</body>
+</html>

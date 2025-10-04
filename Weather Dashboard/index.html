@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Weather Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="container">
+    <header class="topbar">
+      <h1>Weather Dashboard</h1>
+      <div class="controls">
+        <div class="search-wrap">
+          <input id="search" placeholder="Search city (e.g., Seattle)" autocomplete="off" />
+          <div id="suggestions" class="suggestions hidden"></div>
+        </div>
+        <button id="locate" type="button">Use my location</button>
+        <select id="units" title="Units">
+          <option value="metric" selected>°C, m/s</option>
+          <option value="imperial">°F, mph</option>
+        </select>
+        <button id="refresh" type="button">Refresh</button>
+      </div>
+    </header>
+
+    <section id="status" class="status hidden"></section>
+
+    <section id="current" class="current card hidden">
+      <div class="place">
+        <h2 id="place-name">—</h2>
+        <div id="coords" class="muted">—</div>
+      </div>
+      <div class="now">
+        <div class="temp">
+          <div id="now-icon" class="wx-icon">☀️</div>
+          <div>
+            <div id="now-temp" class="now-temp">—</div>
+            <div id="now-desc" class="muted small">—</div>
+          </div>
+        </div>
+        <div class="stats">
+          <div>Feels: <strong id="now-feels">—</strong></div>
+          <div>Humidity: <strong id="now-humidity">—</strong></div>
+          <div>Wind: <strong id="now-wind">—</strong></div>
+          <div>Precip: <strong id="now-pop">—</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3>Hourly (next 24h)</h3>
+      <canvas id="hourlyChart" height="140"></canvas>
+    </section>
+
+    <section class="card">
+      <h3>7-Day Forecast</h3>
+      <div id="daily" class="daily-grid"></div>
+    </section>
+  </main>
+
+  <!-- Chart.js CDN (tiny, no config needed) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

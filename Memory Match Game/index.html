@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Memory Match</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <header class="topbar">
+      <h1>Memory Match</h1>
+      <div class="stats">
+        <span>Moves: <strong id="moves">0</strong></span>
+        <span>Time: <strong id="time">00:00</strong></span>
+        <span>Best: <strong id="best">—</strong></span>
+      </div>
+      <div class="actions">
+        <select id="size">
+          <option value="4">4×4</option>
+          <option value="6">6×6</option>
+        </select>
+        <button id="new">New Game</button>
+      </div>
+    </header>
+
+    <section id="board" class="board" aria-label="Memory board"></section>
+
+    <footer class="hint">
+      Tip: Click two cards to find a pair. Beat your best time & lowest moves!
+    </footer>
+  </main>
+
+  <template id="card-tmpl">
+    <button class="card" aria-label="card" data-state="hidden">
+      <div class="inner">
+        <div class="front">?</div>
+        <div class="back" data-symbol=""></div>
+      </div>
+    </button>
+  </template>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quiz Game</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="container">
+    <header class="top">
+      <h1>Quiz Game</h1>
+      <div class="meta">
+        <div>Q: <span id="qNum">—</span>/<span id="qTotal">—</span></div>
+        <div>Score: <span id="score">0</span></div>
+        <div class="timer">⏱ <span id="time">15</span>s</div>
+      </div>
+    </header>
+
+    <!-- start screen -->
+    <section id="start" class="card">
+      <h2>Ready to test your knowledge?</h2>
+      <div class="row">
+        <label>Category
+          <select id="category">
+            <!-- populated by script from questions.json -->
+            <option value="all" selected>All</option>
+          </select>
+        </label>
+        <label>Difficulty
+          <select id="difficulty">
+            <option value="all" selected>All</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </label>
+        <label>Number of questions
+          <select id="count">
+            <option value="5">5</option>
+            <option value="8">8</option>
+            <option value="10" selected>10</option>
+            <option value="15">15</option>
+          </select>
+        </label>
+        <label>Seconds per question
+          <select id="seconds">
+            <option value="10">10</option>
+            <option value="15" selected>15</option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+          </select>
+        </label>
+      </div>
+      <button id="startBtn">Start Quiz</button>
+      <details class="tips">
+        <summary>Keyboard tips</summary>
+        Use <kbd>1</kbd>–<kbd>4</kbd> to answer, <kbd>Enter</kbd> for next.
+      </details>
+      <p id="sourceMsg" class="muted small">Loading questions…</p>
+    </section>
+
+    <!-- quiz screen -->
+    <section id="quiz" class="card hidden">
+      <div id="question" class="question">Question text…</div>
+      <div id="choices" class="choices"></div>
+      <div class="nav">
+        <button id="nextBtn" disabled>Next</button>
+      </div>
+      <div class="progress"><div id="bar" class="bar"></div></div>
+    </section>
+
+    <!-- end screen -->
+    <section id="end" class="card hidden">
+      <h2>All done! 🎉</h2>
+      <p>Your score: <strong id="finalScore">0</strong></p>
+      <form id="saveForm" class="save">
+        <input id="player" placeholder="Your name (optional)" maxlength="20" />
+        <button id="saveBtn" type="submit">Save to High Scores</button>
+      </form>
+      <h3>High Scores</h3>
+      <ol id="highscores" class="scores"></ol>
+      <div class="row">
+        <button id="playAgain">Play again</button>
+        <button id="clearScores" class="danger">Clear scores</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

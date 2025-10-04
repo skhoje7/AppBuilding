@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dice Roller</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <header class="top">
+      <h1>Dice Roller</h1>
+      <div class="controls">
+        <label>Dice
+          <select id="count">
+            <option>1</option><option>2</option><option>3</option>
+            <option>4</option><option>5</option><option>6</option>
+          </select>
+        </label>
+        <label>Sides
+          <select id="sides">
+            <option value="6" selected>d6</option>
+            <option value="8">d8</option>
+            <option value="10">d10</option>
+            <option value="12">d12</option>
+            <option value="20">d20</option>
+          </select>
+        </label>
+        <button id="roll">Roll</button>
+        <button id="clear">Clear</button>
+      </div>
+    </header>
+
+    <section class="board">
+      <div id="dice" class="dice"></div>
+      <div class="summary">
+        <div>Total: <strong id="total">—</strong></div>
+        <div>Average: <strong id="avg">—</strong></div>
+      </div>
+    </section>
+
+    <section class="history-sec">
+      <h2>History</h2>
+      <ul id="history" class="history"></ul>
+    </section>
+  </main>
+
+  <template id="die-tmpl">
+    <div class="die" data-value="">
+      <div class="face">•</div>
+    </div>
+  </template>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Background Color Changer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <header class="top">
+      <h1>Background Color Changer</h1>
+      <div class="controls">
+        <button id="random">Random</button>
+        <button id="copy">Copy HEX</button>
+        <button id="lock">Lock</button>
+        <button id="add">Add to Favorites</button>
+        <button id="clear">Clear Favorites</button>
+      </div>
+    </header>
+
+    <section class="readout">
+      <div>HEX: <strong id="hex">#FFFFFF</strong></div>
+      <div>RGB: <strong id="rgb">rgb(255, 255, 255)</strong></div>
+      <div>Contrast: <strong id="contrast">AAA</strong></div>
+      <div class="hint">Press <kbd>Space</kbd> for random · <kbd>C</kbd> to copy</div>
+    </section>
+
+    <section class="favorites-sec">
+      <h2>Favorites</h2>
+      <div id="favorites" class="favorites"></div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

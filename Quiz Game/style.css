@@ -1,0 +1,173 @@
+/* ====== Theme ====== */
+* { box-sizing: border-box; }
+:root{
+  --bg: #f7f7fb;
+  --card: #ffffff;
+  --ink: #111827;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --accent: #4f46e5;
+
+  --ok: #10b981;          /* green */
+  --bad: #ef4444;         /* red */
+  --warn: #f59e0b;        /* amber */
+
+  --seg-pending: #e5e7eb; /* progress pending segment */
+  --seg-gap: 4px;
+}
+
+html, body { height: 100%; }
+body{
+  margin: 0;
+  font-family: system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+/* ====== Layout ====== */
+.container{
+  max-width: 860px;
+  margin: 28px auto;
+  padding: 0 16px 24px;
+}
+
+.top{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px 18px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.06);
+}
+.top h1{ margin: 0; font-size: 22px; }
+.meta{ display: flex; gap: 14px; align-items: center; color: var(--muted); }
+.timer{ font-weight: 600; color: var(--ink); }
+
+.card{
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px;
+  margin-top: 14px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.04);
+}
+
+.hidden{ display: none; }
+.row{ display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* ====== Controls ====== */
+label{ display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: var(--muted); }
+select, button, input{
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #fff;
+  font: inherit;
+  color: var(--ink);
+  transition: box-shadow .15s ease, transform .02s ease;
+}
+select:focus, button:focus, input:focus{
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(79,70,229,.2);
+}
+/* Primary buttons (Start, Next, Save, etc.) */
+button{
+  cursor: pointer;
+  background: var(--accent);
+  color: #fff;
+  border-color: transparent;
+}
+button:disabled{ opacity: .6; cursor: not-allowed; }
+button:active{ transform: scale(.98); }
+button.danger{
+  background: #fff5f5;
+  border-color: #fdd;
+  color: #991b1b;
+}
+
+/* ====== Question & Choices ====== */
+.question{
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.choices{
+  display: grid;
+  gap: 10px;
+}
+.choice{
+  /* IMPORTANT: override generic button colors */
+  color: var(--ink);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px;
+  font-weight: 500;
+  transition: transform .05s ease, border-color .15s ease, background .15s ease;
+}
+.choice:hover{ border-color: #d1d5db; background: #fcfcfd; }
+.choice .num{
+  width: 28px; height: 28px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  display: grid; place-items: center;
+  font-size: 13px; color: #374151;
+}
+.choice.correct{ border-color: #bbf7d0; background: #ecfdf5; }
+.choice.wrong{ border-color: #fecaca; background: #fff1f2; }
+.choice:disabled{ opacity: .95; cursor: not-allowed; }
+
+/* ====== Segmented Progress Bar ====== */
+.progress{
+  height: 12px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  margin-top: 14px;
+  padding: 0;
+  overflow: hidden;
+}
+#bar{
+  display: flex;
+  gap: var(--seg-gap);
+  height: 100%;
+  width: 100%;
+  padding: 0; margin: 0;
+  background: transparent;
+}
+#bar .seg{
+  flex: 1 1 0;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--seg-pending);
+  transition: background-color .2s ease;
+}
+#bar .seg.correct{ background: var(--ok); }
+#bar .seg.wrong{ background: var(--bad); }
+
+/* Helpers */
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.tips{ margin-top: 10px; color: var(--muted); }
+kbd{
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 2px 6px;
+  background: #fff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+
+/* ====== End screen ====== */
+.save{ display: flex; gap: 10px; flex-wrap: wrap; margin: 8px 0; }
+.scores{ padding-left: 18px; }
+
+/* ====== Responsive ====== */
+@media (max-width: 700px){
+  .top{ align-items: start; gap: 8px; }
+  .meta{ flex-wrap: wrap; }
+}
