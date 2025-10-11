@@ -1,4 +1,5 @@
 const WEEKS_PER_YEAR = 52;
+const EARLY_YEAR_THRESHOLD = 30;
 
 const DEFAULT_CATEGORIES = [
     {
@@ -78,12 +79,14 @@ const legendElement = document.getElementById("legend");
 const summaryElement = document.getElementById("summary");
 const legendTemplate = document.getElementById("legend-item-template");
 const summaryTemplate = document.getElementById("summary-item-template");
+const toggleEarlyYearsButton = document.getElementById("toggleEarlyYears");
 
 let categories = [];
 let state = {
     birthdate: "",
     lifespan: 90,
-    weeks: {}
+    weeks: {},
+    compressEarlyYears: true
 };
 
 function loadState() {
@@ -95,6 +98,10 @@ function loadState() {
                 ...saved,
                 weeks: saved.weeks ?? {}
             };
+            state.compressEarlyYears =
+                typeof saved.compressEarlyYears === "boolean"
+                    ? saved.compressEarlyYears
+                    : state.compressEarlyYears;
         }
         if (!Array.isArray(saved?.categories)) {
             categories = [...DEFAULT_CATEGORIES];
@@ -227,6 +234,44 @@ function getCurrentWeekIndex() {
     return Math.floor(diff / weekMs);
 }
 
+function updateEarlyYearsToggle(totalYears) {
+    if (!toggleEarlyYearsButton) return;
+
+    const canCompress = totalYears > EARLY_YEAR_THRESHOLD;
+    toggleEarlyYearsButton.hidden = !canCompress;
+
+    if (!canCompress) return;
+
+    toggleEarlyYearsButton.textContent = state.compressEarlyYears
+        ? `Expand Ages 0–${EARLY_YEAR_THRESHOLD - 1}`
+        : `Compress Ages 0–${EARLY_YEAR_THRESHOLD - 1}`;
+    toggleEarlyYearsButton.setAttribute("aria-pressed", String(state.compressEarlyYears));
+    toggleEarlyYearsButton.setAttribute(
+        "aria-label",
+        state.compressEarlyYears
+            ? "Expand the first thirty years to show individual weeks"
+            : "Compress the first thirty years into a condensed block"
+    );
+}
+
+function applyRowSizing(totalYears) {
+    if (!gridElement || !axisYearsElement || !gridLayoutElement) return;
+
+    if (state.compressEarlyYears && totalYears > EARLY_YEAR_THRESHOLD) {
+        const rows = Array.from({ length: totalYears }, (_, year) =>
+            year < EARLY_YEAR_THRESHOLD ? "var(--compressed-week-size)" : "var(--week-cell-size)"
+        );
+        const template = rows.join(" ");
+        gridElement.style.gridTemplateRows = template;
+        axisYearsElement.style.gridTemplateRows = template;
+        gridLayoutElement.dataset.earlyCompressed = "true";
+    } else {
+        gridElement.style.removeProperty("grid-template-rows");
+        axisYearsElement.style.removeProperty("grid-template-rows");
+        delete gridLayoutElement.dataset.earlyCompressed;
+    }
+}
+
 function renderAxes(totalWeeks, currentWeekIndex) {
     if (!gridLayoutElement || !axisWeeksElement || !axisYearsElement) return;
 
@@ -256,7 +301,24 @@ function renderAxes(totalWeeks, currentWeekIndex) {
         axisWeeksElement.append(label);
     }
 
-    for (let year = 0; year < totalYears; year += 1) {
+    const isCompressed = state.compressEarlyYears && totalYears > EARLY_YEAR_THRESHOLD;
+
+    if (isCompressed) {
+        const groupLabel = document.createElement("span");
+        groupLabel.className = "axis-label axis-label--group";
+        groupLabel.textContent = `Age 0–${EARLY_YEAR_THRESHOLD - 1}`;
+        groupLabel.style.gridRow = `span ${EARLY_YEAR_THRESHOLD}`;
+
+        if (currentYear !== null && currentYear < EARLY_YEAR_THRESHOLD) {
+            groupLabel.classList.add("axis-label--current");
+        }
+
+        axisYearsElement.append(groupLabel);
+    }
+
+    const startYear = isCompressed ? EARLY_YEAR_THRESHOLD : 0;
+
+    for (let year = startYear; year < totalYears; year += 1) {
         const label = document.createElement("span");
         label.className = "axis-label";
         label.textContent = `Age ${year}`;
@@ -272,15 +334,23 @@ function renderAxes(totalWeeks, currentWeekIndex) {
 function renderGrid() {
     gridElement.innerHTML = "";
     const totalWeeks = Math.max(1, Math.round(state.lifespan * WEEKS_PER_YEAR));
+    const totalYears = Math.ceil(totalWeeks / WEEKS_PER_YEAR);
     const currentWeekIndex = getCurrentWeekIndex();
 
     renderAxes(totalWeeks, currentWeekIndex);
+    applyRowSizing(totalYears);
+    updateEarlyYearsToggle(totalYears);
 
     for (let index = 0; index < totalWeeks; index += 1) {
         const cell = document.createElement("button");
         cell.type = "button";
         cell.className = "week";
         cell.dataset.index = index;
+        const { year } = getWeekPosition(index);
+        cell.dataset.year = String(year);
+        if (state.compressEarlyYears && year < EARLY_YEAR_THRESHOLD) {
+            cell.dataset.early = "true";
+        }
         const tooltip = weekTooltip(index);
         cell.title = tooltip;
         cell.setAttribute("aria-label", `${tooltip}. Click to assign a category.`);
@@ -403,6 +473,12 @@ function handleSaveCustomColor() {
     categorySelect.value = category.id;
 }
 
+function handleToggleEarlyYears() {
+    state.compressEarlyYears = !state.compressEarlyYears;
+    saveState();
+    renderGrid();
+}
+
 function hydrateControls() {
     if (state.birthdate) {
         birthdateInput.value = state.birthdate;
@@ -423,6 +499,7 @@ function init() {
     birthdateInput.addEventListener("change", handleBirthdateChange);
     lifespanInput.addEventListener("change", handleLifespanChange);
     saveCustomColorButton.addEventListener("click", handleSaveCustomColor);
+    toggleEarlyYearsButton?.addEventListener("click", handleToggleEarlyYears);
 }
 
 init();
