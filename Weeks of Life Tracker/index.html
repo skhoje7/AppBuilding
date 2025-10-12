@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weeks of Life Tracker</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <header>
+        <h1>Weeks of Life Tracker</h1>
+        <p>Visualize each week of your life and color-code it based on what defined that time.</p>
+    </header>
+
+    <main>
+        <div class="tabset" role="tablist" aria-label="Weeks of Life sections">
+            <button id="tab-grid" class="tab is-active" role="tab" aria-selected="true" aria-controls="panel-grid" data-tab-target="grid">
+                Grid
+            </button>
+            <button id="tab-settings" class="tab" role="tab" aria-selected="false" aria-controls="panel-settings" data-tab-target="settings">
+                Settings
+            </button>
+        </div>
+
+        <section id="panel-grid" class="tab-panel is-active" role="tabpanel" aria-labelledby="tab-grid" data-tab-panel="grid">
+            <section class="legend legend--inline" id="legend" aria-label="Category descriptions"></section>
+
+            <div class="grid-wrapper">
+                <div class="grid-layout" id="gridLayout">
+                    <div class="corner-label" aria-hidden="true">
+                        <span>Year</span>
+                        <span>↓</span>
+                        <span>Week →</span>
+                    </div>
+                    <div class="axis axis-x" id="axis-weeks" aria-hidden="true"></div>
+                    <div class="axis axis-y" id="axis-years" aria-hidden="true"></div>
+                    <div id="grid" class="grid" role="grid" aria-label="Weeks of life"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="panel-settings" class="tab-panel" role="tabpanel" aria-labelledby="tab-settings" data-tab-panel="settings" hidden>
+            <section class="controls">
+                <div class="input-group">
+                    <label for="birthdate">Birthdate</label>
+                    <input type="date" id="birthdate" />
+                </div>
+                <div class="input-group">
+                    <label for="lifespan">Expected Lifespan (years)</label>
+                    <input type="number" id="lifespan" min="1" max="120" value="90" />
+                </div>
+            </section>
+
+            <section class="week-selection" id="weekSelection" hidden aria-live="polite">
+                <div class="week-selection__header">
+                    <h2>Selected Week</h2>
+                    <button type="button" class="secondary" id="clearWeekButton">Clear Week</button>
+                </div>
+                <p id="selectedWeekLabel" class="week-selection__details"></p>
+                <p id="selectedWeekRange" class="week-selection__details"></p>
+                <p id="selectedWeekStatus" class="week-selection__details"></p>
+                <div class="category-picker">
+                    <h3 class="category-picker__title" id="categoryPickerTitle">Assign Category</h3>
+                    <div
+                        id="categoryPicker"
+                        class="category-picker__options"
+                        role="group"
+                        aria-labelledby="categoryPickerTitle"
+                    ></div>
+                </div>
+            </section>
+
+            <section class="category-manager" aria-labelledby="categoryManagerHeading">
+                <div class="category-manager__intro">
+                    <div>
+                        <h2 id="categoryManagerHeading">Category Manager</h2>
+                        <p>Curate the colors that you assign to each week and keep the legend in sync.</p>
+                    </div>
+                    <p class="category-manager__hint">Remove a category to clear any weeks using it.</p>
+                </div>
+
+                <form id="categoryForm" class="category-form">
+                    <div class="input-group">
+                        <label for="newCategoryName">Category Name</label>
+                        <input type="text" id="newCategoryName" name="name" placeholder="e.g. Family Time" required />
+                    </div>
+                    <div class="input-group">
+                        <label for="newCategoryColor">Color</label>
+                        <input type="color" id="newCategoryColor" name="color" value="#6366f1" required />
+                    </div>
+                    <div class="input-group input-group--wide">
+                        <label for="newCategoryDescription">Description <span class="optional">(optional)</span></label>
+                        <input
+                            type="text"
+                            id="newCategoryDescription"
+                            name="description"
+                            placeholder="What does this category represent?"
+                        />
+                    </div>
+                    <button type="submit" class="primary">Add Category</button>
+                </form>
+
+                <ul id="categoryList" class="category-list" aria-live="polite"></ul>
+            </section>
+
+            <section class="summary" id="summary"></section>
+        </section>
+    </main>
+
+    <template id="legend-item-template">
+        <div class="legend-item">
+            <span class="swatch"></span>
+            <div>
+                <strong class="label"></strong>
+                <p class="description"></p>
+            </div>
+        </div>
+    </template>
+
+    <template id="summary-item-template">
+        <div class="summary-item">
+            <span class="swatch"></span>
+            <div>
+                <strong class="label"></strong>
+                <span class="count"></span>
+            </div>
+        </div>
+    </template>
+
+    <script src="script.js"></script>
+</body>
+</html>
