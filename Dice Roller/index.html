@@ -62,6 +62,22 @@
           <span>Table</span>
           <input id="supabase-table" type="text" placeholder="dice_rolls" autocomplete="off">
         </label>
+        <fieldset class="auth">
+          <legend>Authentication (required when RLS is enabled)</legend>
+          <p class="supabase-help auth-help">Sign in with a Supabase email/password user who is allowed to insert into the table. Passwords are never stored.</p>
+          <label class="field">
+            <span>Email</span>
+            <input id="supabase-email" type="email" placeholder="dice@example.com" autocomplete="email">
+          </label>
+          <label class="field">
+            <span>Password</span>
+            <input id="supabase-password" type="password" placeholder="Supabase password" autocomplete="current-password">
+          </label>
+          <div class="auth-buttons">
+            <button id="supabase-login" type="button">Sign in</button>
+            <button id="supabase-logout" type="button">Sign out</button>
+          </div>
+        </fieldset>
         <label class="toggle">
           <input id="supabase-sync" type="checkbox">
           <span>Enable Supabase sync</span>
@@ -71,7 +87,7 @@
       <p id="supabase-status" class="supabase-status" role="status" aria-live="polite">Supabase sync is disabled.</p>
       <details class="supabase-note">
         <summary>How the data is saved</summary>
-        <p>Each roll is inserted into the selected table with the columns <code>rolled_at</code> (timestamp), <code>dice_count</code>, <code>sides</code>, <code>values</code> (array), <code>total</code>, and <code>average</code>. Make sure your table schema can accept these fields.</p>
+        <p>Each roll is inserted into the selected table with the columns <code>rolled_at</code> (timestamp), <code>dice_count</code>, <code>sides</code>, <code>values</code> (array), <code>total</code>, <code>average</code>, and <code>user_id</code> (UUID). When RLS is on, add a policy such as <code>using (auth.uid() = user_id) with check (auth.uid() = user_id)</code> so that authenticated users can insert their own rolls.</p>
       </details>
     </section>
   </main>

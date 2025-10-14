@@ -34,8 +34,15 @@ select,button{border:1px solid var(--line);border-radius:10px;padding:8px 12px;b
 .supabase-form .field{display:grid;gap:4px;font-size:14px;color:var(--muted)}
 .supabase-form input{border:1px solid var(--line);border-radius:10px;padding:8px 12px;font:inherit}
 .supabase-form input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.supabase-form fieldset.auth{border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:10px}
+.supabase-form fieldset.auth legend{font-weight:600;font-size:13px;color:var(--muted);padding:0 4px}
+.supabase-form .auth-help{margin:0;font-size:13px;line-height:1.5}
 .supabase-form button{justify-self:start;border:1px solid var(--accent);background:var(--accent);color:#fff;border-radius:10px;padding:8px 14px;font:inherit;cursor:pointer}
 .supabase-form button:active{transform:scale(.98)}
+.supabase-form button[disabled]{opacity:.6;cursor:not-allowed;transform:none}
+.supabase-form .auth-buttons{display:flex;gap:8px;flex-wrap:wrap}
+.supabase-form .auth-buttons button{background:transparent;color:var(--accent)}
+.supabase-form .auth-buttons button:hover{background:rgba(79,70,229,.08)}
 .supabase-form .toggle{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
 .supabase-form .toggle input{width:auto;accent-color:var(--accent)}
 .supabase-status{margin:0;font-size:14px;padding:10px 12px;border-radius:12px;background:#f3f4f6;color:#111827}
