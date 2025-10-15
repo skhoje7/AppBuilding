@@ -14,7 +14,8 @@ const supaStatus = document.getElementById('supabase-status');
 const supaTabs = document.querySelectorAll('.supabase-tab');
 const supaPanels = document.querySelectorAll('[data-tab-panel]');
 const supaHistoryState = document.getElementById('supabase-history-state');
-const supaHistoryList = document.getElementById('supabase-remote-history');
+const supaHistoryTable = document.getElementById('supabase-remote-history');
+const supaHistoryTbody = supaHistoryTable?.querySelector('tbody') ?? null;
 
 const DICE_FACE = ['', '⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
 
@@ -73,17 +74,20 @@ function setStatus(message, tone = 'default'){
 }
 
 function setHistoryState(message, tone = 'default'){
-  if (!supaHistoryState) return;
-  supaHistoryState.textContent = message;
-  if (tone === 'default'){
-    supaHistoryState.removeAttribute('data-tone');
-  } else {
-    supaHistoryState.setAttribute('data-tone', tone);
+  if (supaHistoryState){
+    supaHistoryState.textContent = message;
+    if (tone === 'default'){
+      supaHistoryState.removeAttribute('data-tone');
+    } else {
+      supaHistoryState.setAttribute('data-tone', tone);
+    }
+    supaHistoryState.hidden = false;
   }
-  supaHistoryState.hidden = false;
-  if (supaHistoryList){
-    supaHistoryList.hidden = true;
-    supaHistoryList.innerHTML = '';
+  if (supaHistoryTable){
+    supaHistoryTable.hidden = true;
+  }
+  if (supaHistoryTbody){
+    supaHistoryTbody.innerHTML = '';
   }
 }
 
@@ -99,8 +103,8 @@ function resetRemoteHistory(message){
 }
 
 function renderRemoteHistory(){
-  if (!supaHistoryList) return;
-  supaHistoryList.innerHTML = '';
+  if (!supaHistoryTable || !supaHistoryTbody) return;
+  supaHistoryTbody.innerHTML = '';
   if (!remoteHistory.length){
     setHistoryState('No saved rolls found yet. Roll some dice to create history.');
     return;
@@ -110,25 +114,15 @@ function renderRemoteHistory(){
     supaHistoryState.hidden = true;
   }
 
-  supaHistoryList.hidden = false;
+  supaHistoryTable.hidden = false;
 
   for (const record of remoteHistory){
-    const li = document.createElement('li');
+    const row = document.createElement('tr');
 
     const when = record.rolled_at ? new Date(record.rolled_at) : null;
-    const timeEl = document.createElement('time');
-    if (when && !Number.isNaN(when.getTime())){
-      timeEl.dateTime = when.toISOString();
-      timeEl.textContent = when.toLocaleString();
-    } else {
-      timeEl.textContent = 'Unknown time';
-    }
-
-    const diceCount = record.dice_count ?? (Array.isArray(record.values) ? record.values.length : undefined);
-    const sides = record.sides ?? '?';
-
-    const label = document.createElement('strong');
-    label.textContent = `d${sides} ×${diceCount ?? '?'} → ${record.total ?? '—'}`;
+    const hasValidDate = when && !Number.isNaN(when.getTime());
+    const dateText = hasValidDate ? when.toLocaleDateString() : '—';
+    const timeText = hasValidDate ? when.toLocaleTimeString() : '—';
 
     let values = [];
     if (Array.isArray(record.values)){
@@ -138,28 +132,38 @@ function renderRemoteHistory(){
       values = trimmed ? trimmed.split(',').map((part) => Number(part.trim())).filter((num) => !Number.isNaN(num)) : [];
     }
 
-    const valuesLine = document.createElement('span');
-    if (values.length){
-      valuesLine.textContent = values.join(', ');
-    } else {
-      valuesLine.textContent = 'No individual values recorded.';
+    const diceCount = record.dice_count ?? (values.length ? values.length : null);
+    const sides = record.sides ?? null;
+    const total = record.total ?? (values.length ? values.reduce((sum, num) => sum + num, 0) : null);
+    const avgValue = record.average ?? (values.length ? ((total ?? 0) / values.length) : null);
+
+    const totalNumber = total !== null && total !== undefined ? Number(total) : null;
+    const averageNumber = avgValue !== null && avgValue !== undefined ? Number(avgValue) : null;
+
+    const cells = [
+      { text: dateText },
+      { text: timeText },
+      { text: diceCount !== null && diceCount !== undefined ? String(diceCount) : '—', align: 'right' },
+      { text: sides !== null && sides !== undefined ? String(sides) : '—', align: 'right' },
+      { text: totalNumber !== null && !Number.isNaN(totalNumber) ? String(totalNumber) : '—', align: 'right' },
+      { text: averageNumber !== null && !Number.isNaN(averageNumber) ? averageNumber.toFixed(2) : '—', align: 'right' }
+    ];
+
+    for (const cellDef of cells){
+      const cell = document.createElement('td');
+      cell.textContent = typeof cellDef.text === 'number' ? String(cellDef.text) : cellDef.text;
+      if (cellDef.align === 'right'){
+        cell.dataset.align = 'right';
+      }
+      row.appendChild(cell);
     }
 
-    const avg = record.average ?? (values.length ? (values.reduce((a, b) => a + b, 0) / values.length) : null);
-    if (avg !== null && avg !== undefined){
-      const averageLine = document.createElement('span');
-      averageLine.textContent = `avg: ${Number(avg).toFixed(2)}`;
-      li.append(timeEl, label, valuesLine, averageLine);
-    } else {
-      li.append(timeEl, label, valuesLine);
-    }
-
-    supaHistoryList.appendChild(li);
+    supaHistoryTbody.appendChild(row);
   }
 }
 
 async function loadRemoteHistory(force = false){
-  if (!supaHistoryList) return;
+  if (!supaHistoryTable || !supaHistoryTbody) return;
   if (!supabaseConfig?.enabled){
     resetRemoteHistory('Enable sync from the settings page to view saved rolls.');
     return;

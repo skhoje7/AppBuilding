@@ -62,7 +62,19 @@
         </section>
         <section class="supabase-panel" role="tabpanel" aria-labelledby="supabase-tab-history" data-tab-panel="history" hidden>
           <div id="supabase-history-state" class="supabase-history-state">Enable sync and sign in from the settings page to view your saved rolls.</div>
-          <ul id="supabase-remote-history" class="supabase-remote-history" hidden></ul>
+          <table id="supabase-remote-history" class="supabase-remote-history" hidden>
+            <thead>
+              <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Timestamp</th>
+                <th scope="col">Dice Count</th>
+                <th scope="col">Sides</th>
+                <th scope="col">Total</th>
+                <th scope="col">Average</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </section>
       </div>
     </section>
