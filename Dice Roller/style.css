@@ -25,3 +25,45 @@ select,button{border:1px solid var(--line);border-radius:10px;padding:8px 12px;b
 .history-sec{margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 16px}
 .history{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .history li{font-family:ui-monospace, SFMono-Regular, Menlo, monospace;color:#374151;background:#fafafa;border:1px solid var(--line);border-radius:10px;padding:6px 8px}
+
+.supabase{margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;gap:16px}
+.supabase-header{display:grid;gap:6px}
+.supabase-header h2{margin:0}
+.supabase-help{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
+.supabase-form{display:grid;gap:12px}
+.supabase-form .field{display:grid;gap:4px;font-size:14px;color:var(--muted)}
+.supabase-form input{border:1px solid var(--line);border-radius:10px;padding:8px 12px;font:inherit}
+.supabase-form input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.supabase-form fieldset.auth{border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:10px}
+.supabase-form fieldset.auth legend{font-weight:600;font-size:13px;color:var(--muted);padding:0 4px}
+.supabase-form .auth-help{margin:0;font-size:13px;line-height:1.5}
+.supabase-form button{justify-self:start;border:1px solid var(--accent);background:var(--accent);color:#fff;border-radius:10px;padding:8px 14px;font:inherit;cursor:pointer}
+.supabase-form button:active{transform:scale(.98)}
+.supabase-form button[disabled]{opacity:.6;cursor:not-allowed;transform:none}
+.supabase-form .auth-buttons{display:flex;gap:8px;flex-wrap:wrap}
+.supabase-form .auth-buttons button{background:transparent;color:var(--accent)}
+.supabase-form .auth-buttons button:hover{background:rgba(79,70,229,.08)}
+.supabase-form .toggle{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
+.supabase-form .toggle input{width:auto;accent-color:var(--accent)}
+.supabase-status{margin:0;font-size:14px;padding:10px 12px;border-radius:12px;background:#f3f4f6;color:#111827}
+.supabase-status[data-tone="pending"]{background:#fef3c7;color:#92400e}
+.supabase-status[data-tone="success"]{background:#ecfdf5;color:#047857}
+.supabase-status[data-tone="error"]{background:#fee2e2;color:#b91c1c}
+.supabase-note{font-size:14px}
+.supabase-note summary{cursor:pointer;color:var(--accent)}
+.supabase-note p{margin-top:8px;color:var(--muted);line-height:1.5}
+.top-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%}
+.link-button{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;border:1px solid var(--accent);background:transparent;color:var(--accent);font:600 14px/1 system-ui,Segoe UI,Roboto,Helvetica,Arial;text-decoration:none;transition:background .2s,color .2s}
+.link-button:hover{background:rgba(79,70,229,.08)}
+.link-button:focus{outline:2px solid var(--accent);outline-offset:2px}
+.settings-top{flex-direction:column;align-items:flex-start;gap:12px}
+.settings-intro{margin:0;font-size:15px;line-height:1.5;color:var(--muted)}
+.settings-page{display:grid;gap:16px}
+.supabase-status-only{gap:12px}
+.supabase-status-only .supabase-link{margin:0}
+.supabase-status-only .supabase-link .link-button{font-size:13px;padding:6px 12px}
+@media (max-width:640px){
+  .top{flex-direction:column;align-items:flex-start;gap:12px}
+  .controls{width:100%;justify-content:flex-start}
+  .top-bar{flex-direction:column;align-items:flex-start}
+}
