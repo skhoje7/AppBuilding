@@ -9,7 +9,18 @@
 <body>
   <main class="container">
     <header class="top">
-      <h1>Dice Roller</h1>
+      <div class="top-bar">
+        <h1>Dice Roller</h1>
+      </div>
+      <nav class="page-nav" aria-label="Page navigation">
+        <a class="link-button" href="index.html" aria-current="page">Roll Dice</a>
+        <a class="link-button" href="history.html">Past Saved Data</a>
+        <a class="link-button" href="trends.html">View Trends</a>
+        <a class="link-button" href="settings.html">Supabase Settings</a>
+      </nav>
+    </header>
+
+    <section class="control-panel" aria-label="Roll controls">
       <div class="controls">
         <label>Dice
           <select id="count">
@@ -29,7 +40,7 @@
         <button id="roll">Roll</button>
         <button id="clear">Clear</button>
       </div>
-    </header>
+    </section>
 
     <section class="board">
       <div id="dice" class="dice"></div>
@@ -43,6 +54,19 @@
       <h2>History</h2>
       <ul id="history" class="history"></ul>
     </section>
+
+    <section class="supabase supabase-status-only" aria-labelledby="supabase-heading">
+      <div class="supabase-header">
+        <h2 id="supabase-heading">Supabase Sync</h2>
+        <p class="supabase-help">Configure Supabase credentials and authentication from the settings page to sync your roll history while keeping RLS enabled.</p>
+      </div>
+      <p id="supabase-status" class="supabase-status" role="status" aria-live="polite">Supabase sync is disabled. Configure settings to enable sync.</p>
+      <div class="supabase-links">
+        <a class="link-button" href="settings.html">Open Supabase Settings</a>
+        <a class="link-button" href="history.html">View Past Saved Data</a>
+        <a class="link-button" href="trends.html">View Trends</a>
+      </div>
+    </section>
   </main>
 
   <template id="die-tmpl">
@@ -51,6 +75,6 @@
     </div>
   </template>
 
-  <script src="script.js"></script>
+  <script type="module" src="roller.js"></script>
 </body>
 </html>

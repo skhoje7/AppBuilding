@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trends - Dice Roller</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <header class="top">
+      <div class="top-bar">
+        <h1>Trends</h1>
+      </div>
+      <nav class="page-nav" aria-label="Page navigation">
+        <a class="link-button" href="index.html">Roll Dice</a>
+        <a class="link-button" href="history.html">Past Saved Data</a>
+        <a class="link-button" href="trends.html" aria-current="page">View Trends</a>
+        <a class="link-button" href="settings.html">Supabase Settings</a>
+      </nav>
+    </header>
+
+    <section class="supabase" aria-labelledby="trends-heading">
+      <div class="supabase-header">
+        <h2 id="trends-heading">Supabase Trends</h2>
+        <p class="supabase-help">Chart the totals or averages of your saved rolls over time. Sign in from the settings page to load your personal data.</p>
+      </div>
+      <p id="supabase-status" class="supabase-status" role="status" aria-live="polite">Supabase sync is disabled. Configure settings to enable sync.</p>
+      <div class="supabase-trend-controls" role="group" aria-label="Trend metric">
+        <button type="button" class="trend-toggle is-active" data-trend-metric="total" aria-pressed="true">Totals</button>
+        <button type="button" class="trend-toggle" data-trend-metric="average" aria-pressed="false">Averages</button>
+      </div>
+      <div id="supabase-trend-state" class="supabase-history-state">Enable sync and sign in from the settings page to view charts of your saved rolls.</div>
+      <div class="supabase-trend-canvas" hidden>
+        <canvas id="supabase-trend-chart" aria-label="Supabase roll trends" role="img"></canvas>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="trends.js"></script>
+</body>
+</html>
