@@ -13,7 +13,6 @@
         <h1>Trends</h1>
       </div>
       <div class="top-actions">
-        <p id="supabase-status" class="supabase-status supabase-status--header" role="status" aria-live="polite">Supabase sync is disabled. Configure settings to enable sync.</p>
         <nav class="page-nav" aria-label="Page navigation">
           <a class="link-button" href="index.html">Roll Dice</a>
           <a class="link-button" href="history.html">Past Saved Data</a>
@@ -37,6 +36,10 @@
         <canvas id="supabase-trend-chart" aria-label="Supabase roll trends" role="img"></canvas>
       </div>
     </section>
+
+    <footer class="page-footer">
+      <p id="supabase-status" class="supabase-status supabase-status--footer" role="status" aria-live="polite">Supabase sync is disabled. Configure settings to enable sync.</p>
+    </footer>
   </main>
 
   <script type="module" src="trends.js"></script>

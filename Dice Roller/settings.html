@@ -13,7 +13,6 @@
         <h1>Supabase Settings</h1>
       </div>
       <div class="top-actions">
-        <p id="supabase-status" class="supabase-status supabase-status--header" role="status" aria-live="polite">Supabase sync is disabled.</p>
         <nav class="page-nav" aria-label="Page navigation">
           <a class="link-button" href="index.html">Roll Dice</a>
           <a class="link-button" href="history.html">Past Saved Data</a>
@@ -61,6 +60,10 @@
         <p>Each roll is inserted into the selected table with the columns <code>rolled_at</code> (timestamp), <code>dice_count</code>, <code>sides</code>, <code>values</code> (array), <code>total</code>, <code>average</code>, and <code>user_id</code> (UUID). When RLS is on, add a policy such as <code>using (auth.uid() = user_id) with check (auth.uid() = user_id)</code> so that authenticated users can insert their own rolls.</p>
       </details>
     </section>
+
+    <footer class="page-footer">
+      <p id="supabase-status" class="supabase-status supabase-status--footer" role="status" aria-live="polite">Supabase sync is disabled.</p>
+    </footer>
   </main>
 
   <script type="module" src="settings.js"></script>
