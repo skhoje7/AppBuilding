@@ -17,8 +17,6 @@ let remoteHistoryLoaded = false;
 let remoteHistoryLoading = false;
 let trendMetric = 'total';
 let trendChart = null;
-let chartModulePromise = null;
-let chartLibraryInitialized = false;
 
 function setStatus(message, tone = 'default'){
   if (!supaStatus) return;
@@ -69,82 +67,11 @@ function destroyTrendChart(){
   }
 }
 
-function loadChartGlobal(){
-  if (typeof window === 'undefined'){
-    return Promise.reject(new Error('Chart.js global loader requires a browser environment.'));
-  }
-
-  if (window.Chart){
-    return Promise.resolve({ Chart: window.Chart });
-  }
-
-  return new Promise((resolve, reject) => {
-    const existing = document.querySelector('script[data-chartjs-loader]');
-    if (existing){
-      existing.addEventListener('load', () => {
-        if (window.Chart){
-          resolve({ Chart: window.Chart });
-        } else {
-          reject(new Error('Chart.js global failed to initialize.'));
-        }
-      }, { once: true });
-      existing.addEventListener('error', () => {
-        reject(new Error('Chart.js global script failed to load.'));
-      }, { once: true });
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js';
-    script.async = true;
-    script.crossOrigin = 'anonymous';
-    script.dataset.chartjsLoader = 'true';
-    script.addEventListener('load', () => {
-      if (window.Chart){
-        resolve({ Chart: window.Chart });
-      } else {
-        reject(new Error('Chart.js global failed to initialize.'));
-      }
-    }, { once: true });
-    script.addEventListener('error', () => {
-      reject(new Error('Chart.js global script failed to load.'));
-    }, { once: true });
-    document.head.appendChild(script);
-  });
-}
-
-async function loadChartModule(){
-  if (!chartModulePromise){
-    chartModulePromise = (async () => {
-      try {
-        return await import('https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.esm.js');
-      } catch (error){
-        console.warn('Falling back to Chart.js UMD build after ESM load failure.', error);
-        return await loadChartGlobal();
-      }
-    })();
-  }
-
-  try {
-    return await chartModulePromise;
-  } catch (error){
-    chartModulePromise = null;
-    throw error;
-  }
-}
-
-async function ensureTrendChart(){
+function ensureTrendChart(){
   if (!supaTrendCanvas) return null;
-  const module = await loadChartModule();
-  const { Chart, registerables } = module;
+  const { Chart } = window;
   if (!Chart){
     throw new Error('Chart.js library unavailable.');
-  }
-  if (!chartLibraryInitialized){
-    if (registerables?.length && typeof Chart.register === 'function'){
-      Chart.register(...registerables);
-    }
-    chartLibraryInitialized = true;
   }
   if (!trendChart){
     trendChart = new Chart(supaTrendCanvas, {
