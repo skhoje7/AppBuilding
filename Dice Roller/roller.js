@@ -16,6 +16,10 @@ const supaPanels = document.querySelectorAll('[data-tab-panel]');
 const supaHistoryState = document.getElementById('supabase-history-state');
 const supaHistoryTable = document.getElementById('supabase-remote-history');
 const supaHistoryTbody = supaHistoryTable?.querySelector('tbody') ?? null;
+const supaTrendState = document.getElementById('supabase-trend-state');
+const supaTrendCanvasWrap = document.querySelector('.supabase-trend-canvas');
+const supaTrendCanvas = document.getElementById('supabase-trend-chart');
+const supaTrendToggleButtons = document.querySelectorAll('[data-trend-metric]');
 
 const DICE_FACE = ['', '⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
 
@@ -29,6 +33,9 @@ let remoteHistory = [];
 let remoteHistoryLoaded = false;
 let remoteHistoryLoading = false;
 let activeSupabaseTab = 'status';
+let trendMetric = 'total';
+let trendChart = null;
+let chartModulePromise = null;
 
 function rand(n){
   return Math.floor(Math.random() * n) + 1;
@@ -91,15 +98,236 @@ function setHistoryState(message, tone = 'default'){
   }
 }
 
+function setTrendState(message, tone = 'default'){
+  if (supaTrendState){
+    if (message){
+      supaTrendState.textContent = message;
+      if (tone === 'default'){
+        supaTrendState.removeAttribute('data-tone');
+      } else {
+        supaTrendState.setAttribute('data-tone', tone);
+      }
+      supaTrendState.hidden = false;
+    } else {
+      supaTrendState.textContent = '';
+      supaTrendState.removeAttribute('data-tone');
+      supaTrendState.hidden = true;
+    }
+  }
+  if (supaTrendCanvasWrap){
+    supaTrendCanvasWrap.hidden = true;
+  }
+}
+
+function destroyTrendChart(){
+  if (trendChart){
+    trendChart.destroy();
+    trendChart = null;
+  }
+}
+
+async function loadChartModule(){
+  if (!chartModulePromise){
+    chartModulePromise = import('https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.esm.js');
+  }
+  return chartModulePromise;
+}
+
+async function ensureTrendChart(){
+  if (!supaTrendCanvas) return null;
+  const module = await loadChartModule();
+  const { Chart, registerables } = module;
+  if (registerables?.length){
+    Chart.register(...registerables);
+  }
+  if (!trendChart){
+    trendChart = new Chart(supaTrendCanvas, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [
+          {
+            label: 'Roll Total',
+            data: [],
+            backgroundColor: 'rgba(79, 70, 229, 0.7)',
+            borderRadius: 6,
+            maxBarThickness: 48
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            ticks: {
+              color: '#4b5563',
+              maxRotation: 0,
+              autoSkip: true,
+              maxTicksLimit: 8
+            },
+            grid: {
+              display: false
+            }
+          },
+          y: {
+            ticks: {
+              color: '#4b5563'
+            },
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(229, 231, 235, 0.6)'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            labels: {
+              color: '#1f2937'
+            }
+          }
+        },
+        animation: {
+          duration: 250
+        }
+      }
+    });
+  }
+  return trendChart;
+}
+
+function computeTrendPoints(metric){
+  if (!remoteHistory.length) return { labels: [], values: [] };
+
+  const entries = [];
+  for (const record of remoteHistory){
+    const when = record.rolled_at ? new Date(record.rolled_at) : null;
+    if (!when || Number.isNaN(when.getTime())) continue;
+
+    let totalValue = null;
+    if (record.total !== null && record.total !== undefined){
+      const parsed = Number(record.total);
+      totalValue = Number.isNaN(parsed) ? null : parsed;
+    }
+
+    let averageValue = null;
+    if (record.average !== null && record.average !== undefined){
+      const parsedAvg = Number(record.average);
+      averageValue = Number.isNaN(parsedAvg) ? null : parsedAvg;
+    }
+
+    if ((metric === 'total' && totalValue === null) || (metric === 'average' && averageValue === null)){
+      if (Array.isArray(record.values) && record.values.length){
+        const computedTotal = record.values.reduce((sum, val) => sum + Number(val || 0), 0);
+        if (!Number.isNaN(computedTotal)){
+          totalValue = computedTotal;
+          averageValue = computedTotal / record.values.length;
+        }
+      } else if (typeof record.values === 'string' && record.values.length){
+        const cleaned = record.values.replace(/[{}]/g, '');
+        const pieces = cleaned ? cleaned.split(',').map((part) => Number(part.trim())).filter((num) => !Number.isNaN(num)) : [];
+        if (pieces.length){
+          const computedTotal = pieces.reduce((sum, val) => sum + val, 0);
+          totalValue = computedTotal;
+          averageValue = computedTotal / pieces.length;
+        }
+      }
+    }
+
+    const value = metric === 'total' ? totalValue : averageValue;
+    if (value === null || Number.isNaN(value)) continue;
+
+    const datePart = when.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    const timePart = when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    entries.push({
+      when,
+      label: `${datePart}\n${timePart}`,
+      value: metric === 'total' ? value : Number(value.toFixed(2))
+    });
+  }
+
+  entries.sort((a, b) => a.when.getTime() - b.when.getTime());
+
+  return {
+    labels: entries.map((entry) => entry.label),
+    values: entries.map((entry) => entry.value)
+  };
+}
+
+async function refreshTrendChart(){
+  if (!supaTrendCanvasWrap || !supaTrendCanvas) return;
+
+  if (remoteHistoryLoading){
+    setTrendState('Loading saved rolls…', 'pending');
+    return;
+  }
+
+  if (!remoteHistory.length){
+    destroyTrendChart();
+    setTrendState('No saved rolls found yet. Roll some dice to create history.');
+    return;
+  }
+
+  const { labels, values } = computeTrendPoints(trendMetric);
+
+  if (!labels.length){
+    destroyTrendChart();
+    setTrendState('Saved rolls are missing valid data for charting.', 'error');
+    return;
+  }
+
+  let chart;
+  try {
+    chart = await ensureTrendChart();
+  } catch (error){
+    console.error('Failed to prepare trend chart', error);
+    setTrendState('Unable to load chart library.', 'error');
+    destroyTrendChart();
+    return;
+  }
+
+  if (!chart){
+    setTrendState('Unable to load chart library.', 'error');
+    destroyTrendChart();
+    return;
+  }
+
+  setTrendState(null);
+  supaTrendCanvasWrap.hidden = false;
+
+  const datasetLabel = trendMetric === 'total' ? 'Roll Total' : 'Roll Average';
+
+  chart.data.labels = labels;
+  chart.data.datasets[0].label = datasetLabel;
+  chart.data.datasets[0].data = values;
+  if (trendMetric === 'average'){
+    chart.options.scales.y.beginAtZero = true;
+  }
+  chart.update();
+}
+
+function updateTrendToggleButtons(){
+  for (const button of supaTrendToggleButtons){
+    const metric = button.dataset.trendMetric;
+    const isActive = metric === trendMetric;
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-pressed', String(isActive));
+  }
+}
+
 function resetRemoteHistory(message){
   remoteHistory = [];
   remoteHistoryLoaded = false;
   remoteHistoryLoading = false;
   if (message){
     setHistoryState(message);
+    setTrendState(message);
   } else if (supaHistoryState){
     supaHistoryState.hidden = true;
+    setTrendState(null);
   }
+  destroyTrendChart();
 }
 
 function renderRemoteHistory(){
@@ -107,6 +335,7 @@ function renderRemoteHistory(){
   supaHistoryTbody.innerHTML = '';
   if (!remoteHistory.length){
     setHistoryState('No saved rolls found yet. Roll some dice to create history.');
+    void refreshTrendChart();
     return;
   }
 
@@ -160,6 +389,8 @@ function renderRemoteHistory(){
 
     supaHistoryTbody.appendChild(row);
   }
+
+  void refreshTrendChart();
 }
 
 async function loadRemoteHistory(force = false){
@@ -181,6 +412,7 @@ async function loadRemoteHistory(force = false){
 
   remoteHistoryLoading = true;
   setHistoryState('Loading saved rolls…', 'pending');
+  setTrendState('Loading saved rolls…', 'pending');
 
   try {
     const { data, error } = await supabaseClient
@@ -194,10 +426,13 @@ async function loadRemoteHistory(force = false){
 
     remoteHistory = Array.isArray(data) ? data : [];
     remoteHistoryLoaded = true;
+    remoteHistoryLoading = false;
     renderRemoteHistory();
   } catch (error){
     console.error('Failed to load Supabase history', error);
     setHistoryState(`Unable to load saved rolls: ${error.message}`, 'error');
+    setTrendState(`Unable to load saved rolls: ${error.message}`, 'error');
+    destroyTrendChart();
   } finally {
     remoteHistoryLoading = false;
   }
@@ -207,7 +442,7 @@ function setAuthUser(user){
   supabaseUser = user;
   if (!user){
     resetRemoteHistory('Sign in on the settings page to view your saved rolls.');
-  } else if (activeSupabaseTab === 'history'){
+  } else if (activeSupabaseTab === 'history' || activeSupabaseTab === 'trends'){
     void loadRemoteHistory(true);
   }
 }
@@ -398,6 +633,11 @@ for (const tab of supaTabs){
 
     if (target === 'history'){
       void loadRemoteHistory();
+    } else if (target === 'trends'){
+      void loadRemoteHistory();
+      if (remoteHistoryLoaded){
+        void refreshTrendChart();
+      }
     }
   });
 }
@@ -411,8 +651,26 @@ if (supaTabs.length){
   }
 }
 
+for (const button of supaTrendToggleButtons){
+  button.addEventListener('click', () => {
+    const metric = button.dataset.trendMetric;
+    if (!metric || metric === trendMetric) return;
+    trendMetric = metric;
+    updateTrendToggleButtons();
+    void refreshTrendChart();
+  });
+}
+
+if (supaTrendToggleButtons.length){
+  updateTrendToggleButtons();
+}
+
 if (supaHistoryState){
   setHistoryState('Enable sync and sign in from the settings page to view your saved rolls.');
+}
+
+if (supaTrendState){
+  setTrendState('Enable sync and sign in from the settings page to view charts of your saved rolls.');
 }
 
 renderHistory();
