@@ -5,6 +5,10 @@ const supaStatus = document.getElementById('supabase-status');
 const supaHistoryState = document.getElementById('supabase-history-state');
 const supaHistoryTable = document.getElementById('supabase-remote-history');
 const supaHistoryTbody = supaHistoryTable?.querySelector('tbody') ?? null;
+const supaHistoryPagination = document.getElementById('supabase-history-pagination');
+const supaHistoryPrev = document.getElementById('supabase-history-prev');
+const supaHistoryNext = document.getElementById('supabase-history-next');
+const supaHistoryPageInfo = document.getElementById('supabase-history-page-info');
 
 let supabaseConfig = null;
 let supabaseClient = null;
@@ -14,6 +18,9 @@ let statusTimer = null;
 let remoteHistory = [];
 let remoteHistoryLoaded = false;
 let remoteHistoryLoading = false;
+let historyPage = 1;
+
+const HISTORY_PAGE_SIZE = 20;
 
 function setStatus(message, tone = 'default'){
   if (!supaStatus) return;
@@ -52,6 +59,37 @@ function setHistoryState(message, tone = 'default'){
   if (supaHistoryTbody){
     supaHistoryTbody.innerHTML = '';
   }
+  if (supaHistoryPagination){
+    supaHistoryPagination.hidden = true;
+  }
+}
+
+function updateHistoryPagination(){
+  if (!supaHistoryPagination) return;
+  if (!remoteHistory.length){
+    supaHistoryPagination.hidden = true;
+    return;
+  }
+
+  const totalPages = Math.max(1, Math.ceil(remoteHistory.length / HISTORY_PAGE_SIZE));
+  if (historyPage > totalPages){
+    historyPage = totalPages;
+  }
+  if (historyPage < 1){
+    historyPage = 1;
+  }
+
+  if (supaHistoryPageInfo){
+    supaHistoryPageInfo.textContent = `Page ${historyPage} of ${totalPages}`;
+  }
+  if (supaHistoryPrev){
+    supaHistoryPrev.disabled = historyPage <= 1;
+  }
+  if (supaHistoryNext){
+    supaHistoryNext.disabled = historyPage >= totalPages;
+  }
+
+  supaHistoryPagination.hidden = totalPages <= 1;
 }
 
 function renderRemoteHistory(){
@@ -68,7 +106,16 @@ function renderRemoteHistory(){
 
   supaHistoryTable.hidden = false;
 
-  for (const record of remoteHistory){
+  const totalPages = Math.max(1, Math.ceil(remoteHistory.length / HISTORY_PAGE_SIZE));
+  if (historyPage > totalPages){
+    historyPage = totalPages;
+  }
+  const startIndex = (historyPage - 1) * HISTORY_PAGE_SIZE;
+  const pageRecords = remoteHistory.slice(startIndex, startIndex + HISTORY_PAGE_SIZE);
+
+  updateHistoryPagination();
+
+  for (const record of pageRecords){
     const row = document.createElement('tr');
 
     const when = record.rolled_at ? new Date(record.rolled_at) : null;
@@ -118,6 +165,7 @@ function resetRemoteHistory(message){
   remoteHistory = [];
   remoteHistoryLoaded = false;
   remoteHistoryLoading = false;
+  historyPage = 1;
   if (message){
     setHistoryState(message);
   } else if (supaHistoryState){
@@ -169,6 +217,7 @@ async function loadRemoteHistory(force = false){
     remoteHistory = Array.isArray(data) ? data : [];
     remoteHistoryLoaded = true;
     remoteHistoryLoading = false;
+    historyPage = 1;
     renderRemoteHistory();
   } catch (error){
     console.error('Failed to load Supabase history', error);
@@ -261,4 +310,21 @@ window.addEventListener('storage', (event) => {
     void applyConfig(updatedConfig);
   }
 });
+
+if (supaHistoryPrev){
+  supaHistoryPrev.addEventListener('click', () => {
+    if (historyPage <= 1) return;
+    historyPage -= 1;
+    renderRemoteHistory();
+  });
+}
+
+if (supaHistoryNext){
+  supaHistoryNext.addEventListener('click', () => {
+    const totalPages = Math.max(1, Math.ceil(remoteHistory.length / HISTORY_PAGE_SIZE));
+    if (historyPage >= totalPages) return;
+    historyPage += 1;
+    renderRemoteHistory();
+  });
+}
 

@@ -19,6 +19,68 @@ let trendMetric = 'total';
 let trendChart = null;
 let chartModulePromise = null;
 
+const trendValueLabelPlugin = {
+  id: 'trendValueLabel',
+  afterDatasetsDraw(chart, args, pluginOptions){
+    const meta = chart.getDatasetMeta(0);
+    if (!meta || meta.hidden) return;
+
+    const dataset = chart.data.datasets?.[meta.index ?? 0];
+    if (!dataset || !Array.isArray(meta.data)) return;
+
+    const options = {
+      color: '#1f2937',
+      offset: 6,
+      font: {
+        size: 12,
+        family: 'system-ui,Segoe UI,Roboto,Helvetica,Arial'
+      },
+      formatValue: (value) => value
+    };
+
+    const config = {
+      ...options,
+      ...(pluginOptions || {})
+    };
+
+    const fontSize = config.font?.size ?? 12;
+    const fontFamily = config.font?.family ?? 'system-ui,Segoe UI,Roboto,Helvetica,Arial';
+    const offset = typeof config.offset === 'number' ? config.offset : 6;
+
+    const { ctx, chartArea } = chart;
+    ctx.save();
+    ctx.fillStyle = config.color ?? '#1f2937';
+    ctx.font = `${fontSize}px ${fontFamily}`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+
+    for (let index = 0; index < meta.data.length; index += 1){
+      const element = meta.data[index];
+      if (!element || element.hidden || element.skip) continue;
+
+      const rawValue = dataset.data?.[index];
+      if (rawValue === undefined || rawValue === null) continue;
+
+      const formatted = config.formatValue ? config.formatValue(rawValue, index, chart) : rawValue;
+      if (formatted === undefined || formatted === null) continue;
+
+      const text = typeof formatted === 'number' ? String(formatted) : `${formatted}`;
+      if (!text.length) continue;
+
+      const position = element.tooltipPosition();
+      let y = position.y - offset;
+      const minY = chartArea.top + fontSize;
+      if (y < minY){
+        y = minY;
+      }
+
+      ctx.fillText(text, position.x, y);
+    }
+
+    ctx.restore();
+  }
+};
+
 function setStatus(message, tone = 'default'){
   if (!supaStatus) return;
   supaStatus.textContent = message;
@@ -142,6 +204,9 @@ async function ensureTrendChart(){
   if (registerables?.length && typeof Chart.register === 'function'){
     Chart.register(...registerables);
   }
+  if (typeof Chart.register === 'function'){
+    Chart.register(trendValueLabelPlugin);
+  }
   if (!trendChart){
     trendChart = new Chart(supaTrendCanvas, {
       type: 'bar',
@@ -186,6 +251,27 @@ async function ensureTrendChart(){
           legend: {
             labels: {
               color: '#1f2937'
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label(context){
+                const value = context.parsed?.y;
+                if (value === null || value === undefined) return context.label || '';
+                if (trendMetric === 'average'){
+                  return `${context.dataset.label}: ${Number(value).toFixed(2)}`;
+                }
+                return `${context.dataset.label}: ${value}`;
+              }
+            }
+          },
+          trendValueLabel: {
+            formatValue(value){
+              if (value === null || value === undefined) return '';
+              if (typeof value === 'number' && trendMetric === 'average'){
+                return Number(value).toFixed(2);
+              }
+              return value;
             }
           }
         },
@@ -303,6 +389,15 @@ async function refreshTrendChart(){
   chart.data.labels = labels;
   chart.data.datasets[0].label = datasetLabel;
   chart.data.datasets[0].data = values;
+  chart.options.plugins = chart.options.plugins ?? {};
+  chart.options.plugins.trendValueLabel = chart.options.plugins.trendValueLabel ?? {};
+  chart.options.plugins.trendValueLabel.formatValue = (value) => {
+    if (value === null || value === undefined) return '';
+    if (typeof value === 'number' && trendMetric === 'average'){
+      return Number(value).toFixed(2);
+    }
+    return value;
+  };
   if (trendMetric === 'average'){
     chart.options.scales.y.beginAtZero = true;
   }
