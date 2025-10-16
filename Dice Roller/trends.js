@@ -18,6 +18,7 @@ let remoteHistoryLoading = false;
 let trendMetric = 'total';
 let trendChart = null;
 let chartModulePromise = null;
+let chartLibraryInitialized = false;
 
 const trendValueLabelPlugin = {
   id: 'trendValueLabel',
@@ -201,11 +202,14 @@ async function ensureTrendChart(){
   if (!Chart){
     throw new Error('Chart.js library unavailable.');
   }
-  if (registerables?.length && typeof Chart.register === 'function'){
-    Chart.register(...registerables);
-  }
-  if (typeof Chart.register === 'function'){
-    Chart.register(trendValueLabelPlugin);
+  if (!chartLibraryInitialized){
+    if (registerables?.length && typeof Chart.register === 'function'){
+      Chart.register(...registerables);
+    }
+    if (typeof Chart.register === 'function'){
+      Chart.register(trendValueLabelPlugin);
+    }
+    chartLibraryInitialized = true;
   }
   if (!trendChart){
     trendChart = new Chart(supaTrendCanvas, {
@@ -474,6 +478,8 @@ async function loadRemoteHistory(force = false){
     console.error('Failed to load Supabase history', error);
     setTrendState(`Unable to load saved rolls: ${error.message}`, 'error');
     destroyTrendChart();
+    remoteHistoryLoaded = false;
+    remoteHistory = [];
   } finally {
     remoteHistoryLoading = false;
   }
