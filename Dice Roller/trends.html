@@ -12,12 +12,15 @@
       <div class="top-bar">
         <h1>Trends</h1>
       </div>
-      <nav class="page-nav" aria-label="Page navigation">
-        <a class="link-button" href="index.html">Roll Dice</a>
-        <a class="link-button" href="history.html">Past Saved Data</a>
-        <a class="link-button" href="trends.html" aria-current="page">View Trends</a>
-        <a class="link-button" href="settings.html">Supabase Settings</a>
-      </nav>
+      <div class="top-actions">
+        <p id="supabase-status" class="supabase-status supabase-status--header" role="status" aria-live="polite">Supabase sync is disabled. Configure settings to enable sync.</p>
+        <nav class="page-nav" aria-label="Page navigation">
+          <a class="link-button" href="index.html">Roll Dice</a>
+          <a class="link-button" href="history.html">Past Saved Data</a>
+          <a class="link-button" href="trends.html" aria-current="page">View Trends</a>
+          <a class="link-button" href="settings.html">Supabase Settings</a>
+        </nav>
+      </div>
     </header>
 
     <section class="supabase" aria-labelledby="trends-heading">
@@ -25,7 +28,6 @@
         <h2 id="trends-heading">Supabase Trends</h2>
         <p class="supabase-help">Chart the totals or averages of your saved rolls over time. Sign in from the settings page to load your personal data.</p>
       </div>
-      <p id="supabase-status" class="supabase-status" role="status" aria-live="polite">Supabase sync is disabled. Configure settings to enable sync.</p>
       <div class="supabase-trend-controls" role="group" aria-label="Trend metric">
         <button type="button" class="trend-toggle is-active" data-trend-metric="total" aria-pressed="true">Totals</button>
         <button type="button" class="trend-toggle" data-trend-metric="average" aria-pressed="false">Averages</button>
