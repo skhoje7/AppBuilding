@@ -1,9 +1,7 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-import { loadConfig, saveConfig, isConfigComplete, STORAGE_KEY } from './supabaseConfig.js';
+import { loadConfig, saveConfig, isConfigComplete, STORAGE_KEY, SUPABASE_URL, SUPABASE_ANON_KEY } from './supabaseConfig.js';
 
 const supaForm = document.getElementById('supabase-form');
-const supaUrlInput = document.getElementById('supabase-url');
-const supaKeyInput = document.getElementById('supabase-key');
 const supaTableInput = document.getElementById('supabase-table');
 const supaSyncInput = document.getElementById('supabase-sync');
 const supaEmailInput = document.getElementById('supabase-email');
@@ -55,8 +53,6 @@ function updateAuthUi(){
 }
 
 function fillForm(config){
-  supaUrlInput.value = config.url;
-  supaKeyInput.value = config.key;
   supaTableInput.value = config.table;
   supaSyncInput.checked = Boolean(config.enabled);
   supaEmailInput.value = config.email ?? '';
@@ -82,13 +78,13 @@ async function applyConfig(config){
   }
 
   if (!isConfigComplete(config)){
-    setStatus('Supabase sync is enabled, but credentials are incomplete.', 'error');
+    setStatus('Supabase sync is enabled, but the table name is missing.', 'error');
     updateAuthUi();
     return;
   }
 
   try {
-    supabaseClient = createClient(config.url, config.key, {
+    supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
         persistSession: true,
         autoRefreshToken: true
@@ -137,8 +133,6 @@ async function applyConfig(config){
 supaForm.addEventListener('submit', (event) => {
   event.preventDefault();
   const config = {
-    url: supaUrlInput.value.trim(),
-    key: supaKeyInput.value.trim(),
     table: (supaTableInput.value.trim() || 'dice_rolls'),
     email: supaEmailInput.value.trim(),
     enabled: supaSyncInput.checked
@@ -153,7 +147,7 @@ supaLoginBtn.addEventListener('click', async () => {
     return;
   }
   if (!supabaseClient){
-    setStatus('Provide a valid Supabase URL, anon key, and table, then save.', 'error');
+    setStatus('Save the Supabase settings to initialize the connection before signing in.', 'error');
     return;
   }
   const email = supaEmailInput.value.trim();

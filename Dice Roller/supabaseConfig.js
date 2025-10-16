@@ -1,8 +1,9 @@
 export const STORAGE_KEY = 'dice-roller.supabase';
 
+export const SUPABASE_URL = 'https://vfliwzxidjajictcntyp.supabase.co';
+export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmbGl3enhpZGphamljdGNudHlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NjQwNjgsImV4cCI6MjA3NjA0MDA2OH0._ZfD4x4JKpNfI3DvafnevY1p8DgdypmsEmJhKO5-d50';
+
 const DEFAULT_CONFIG = Object.freeze({
-  url: '',
-  key: '',
   table: 'dice_rolls',
   email: '',
   enabled: false
@@ -14,8 +15,6 @@ export function loadConfig(){
     if (!raw) return { ...DEFAULT_CONFIG };
     const parsed = JSON.parse(raw);
     return {
-      url: parsed.url ?? '',
-      key: parsed.key ?? '',
       table: parsed.table ?? 'dice_rolls',
       email: parsed.email ?? '',
       enabled: Boolean(parsed.enabled)
@@ -28,8 +27,6 @@ export function loadConfig(){
 
 export function saveConfig(config){
   const toStore = {
-    url: config.url ?? '',
-    key: config.key ?? '',
     table: config.table ? config.table : 'dice_rolls',
     email: config.email ?? '',
     enabled: Boolean(config.enabled)
@@ -38,7 +35,7 @@ export function saveConfig(config){
 }
 
 export function isConfigComplete(config){
-  return Boolean(config?.url && config?.key && config?.table);
+  return Boolean(config?.table);
 }
 
 export function withDefaultConfig(overrides = {}){

@@ -1,5 +1,5 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-import { loadConfig, isConfigComplete, STORAGE_KEY } from './supabaseConfig.js';
+import { loadConfig, isConfigComplete, STORAGE_KEY, SUPABASE_URL, SUPABASE_ANON_KEY } from './supabaseConfig.js';
 
 const supaStatus = document.getElementById('supabase-status');
 const supaHistoryState = document.getElementById('supabase-history-state');
@@ -143,7 +143,7 @@ async function loadRemoteHistory(force = false){
     return;
   }
   if (!supabaseClient){
-    resetRemoteHistory('Save a valid Supabase configuration to view saved rolls.');
+    resetRemoteHistory('Save your Supabase settings to view saved rolls.');
     return;
   }
   if (!supabaseUser){
@@ -198,13 +198,13 @@ async function applyConfig(config){
   }
 
   if (!isConfigComplete(config)){
-    setStatus('Supabase sync is enabled, but credentials are incomplete. Update the settings page.', 'error');
-    resetRemoteHistory('Complete your Supabase credentials to fetch saved rolls.');
+    setStatus('Supabase sync is enabled, but the table name is missing. Update the settings page.', 'error');
+    resetRemoteHistory('Add a table name on the settings page to fetch saved rolls.');
     return;
   }
 
   try {
-    supabaseClient = createClient(config.url, config.key, {
+    supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
         persistSession: true,
         autoRefreshToken: true

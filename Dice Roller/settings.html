@@ -17,23 +17,15 @@
           <a class="link-button" href="trends.html">View Trends</a>
         </nav>
       </div>
-      <p class="settings-intro">Provide your Supabase credentials and sign in with an email/password user so roll history can sync while RLS remains enabled.</p>
+      <p class="settings-intro">Sign in with a Supabase email/password user so roll history can sync while RLS remains enabled. The project connection is preconfigured for you.</p>
     </header>
 
     <section class="supabase" aria-labelledby="supabase-heading">
       <div class="supabase-header">
         <h2 id="supabase-heading">Supabase Sync</h2>
-        <p class="supabase-help">Store your roll history in a Supabase table by providing your project credentials. Nothing is sent unless sync is enabled.</p>
+        <p class="supabase-help">Store your roll history in our configured Supabase project. Nothing is sent unless sync is enabled.</p>
       </div>
       <form id="supabase-form" class="supabase-form">
-        <label class="field">
-          <span>Project URL</span>
-          <input id="supabase-url" type="url" placeholder="https://your-project.supabase.co" autocomplete="off" required>
-        </label>
-        <label class="field">
-          <span>Anon API Key</span>
-          <input id="supabase-key" type="password" placeholder="supabase anon key" autocomplete="off" required>
-        </label>
         <label class="field">
           <span>Table</span>
           <input id="supabase-table" type="text" placeholder="dice_rolls" autocomplete="off">
