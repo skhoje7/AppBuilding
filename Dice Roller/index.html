@@ -9,7 +9,20 @@
 <body>
   <main class="container">
     <header class="top">
-      <h1>Dice Roller</h1>
+      <div class="top-bar">
+        <h1>Dice Roller</h1>
+      </div>
+      <div class="top-actions">
+        <nav class="page-nav" aria-label="Page navigation">
+          <a class="link-button" href="index.html" aria-current="page">Roll Dice</a>
+          <a class="link-button" href="history.html">Past Saved Data</a>
+          <a class="link-button" href="trends.html">View Trends</a>
+          <a class="link-button" href="settings.html">Supabase Settings</a>
+        </nav>
+      </div>
+    </header>
+
+    <section class="control-panel" aria-label="Roll controls">
       <div class="controls">
         <label>Dice
           <select id="count">
@@ -29,7 +42,7 @@
         <button id="roll">Roll</button>
         <button id="clear">Clear</button>
       </div>
-    </header>
+    </section>
 
     <section class="board">
       <div id="dice" class="dice"></div>
@@ -43,6 +56,11 @@
       <h2>History</h2>
       <ul id="history" class="history"></ul>
     </section>
+
+    <footer class="page-footer">
+      <p id="supabase-status" class="supabase-status supabase-status--footer" role="status" aria-live="polite">Supabase sync is disabled. Configure settings to enable sync.</p>
+    </footer>
+
   </main>
 
   <template id="die-tmpl">
@@ -51,6 +69,6 @@
     </div>
   </template>
 
-  <script src="script.js"></script>
+  <script type="module" src="roller.js"></script>
 </body>
 </html>
