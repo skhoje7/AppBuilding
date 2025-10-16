@@ -9,7 +9,9 @@
 <body>
   <main class="container">
     <header class="top">
-      <h1>Dice Roller</h1>
+      <div class="top-bar">
+        <h1>Dice Roller</h1>
+      </div>
       <div class="controls">
         <label>Dice
           <select id="count">
@@ -43,6 +45,50 @@
       <h2>History</h2>
       <ul id="history" class="history"></ul>
     </section>
+
+    <section class="supabase supabase-status-only" aria-labelledby="supabase-heading">
+      <div class="supabase-header">
+        <h2 id="supabase-heading">Supabase Sync</h2>
+        <nav class="supabase-tabs" role="tablist" aria-label="Supabase views">
+          <button type="button" role="tab" id="supabase-tab-status" class="supabase-tab is-active" aria-selected="true" data-tab="status">Sync Status</button>
+          <button type="button" role="tab" id="supabase-tab-history" class="supabase-tab" aria-selected="false" data-tab="history" tabindex="-1">Past Saved Data</button>
+          <button type="button" role="tab" id="supabase-tab-trends" class="supabase-tab" aria-selected="false" data-tab="trends" tabindex="-1">Trends</button>
+        </nav>
+        <p class="supabase-help">Configure Supabase credentials and authentication from the settings page to sync your roll history while keeping RLS enabled.</p>
+      </div>
+      <div class="supabase-panels">
+        <section class="supabase-panel" role="tabpanel" aria-labelledby="supabase-tab-status" data-tab-panel="status">
+          <p id="supabase-status" class="supabase-status" role="status" aria-live="polite">Supabase sync is disabled. Configure settings to enable sync.</p>
+          <p class="supabase-link"><a class="link-button" href="settings.html">Open Supabase Settings</a></p>
+        </section>
+        <section class="supabase-panel" role="tabpanel" aria-labelledby="supabase-tab-history" data-tab-panel="history" hidden>
+          <div id="supabase-history-state" class="supabase-history-state">Enable sync and sign in from the settings page to view your saved rolls.</div>
+          <table id="supabase-remote-history" class="supabase-remote-history" hidden>
+            <thead>
+              <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Timestamp</th>
+                <th scope="col">Dice Count</th>
+                <th scope="col">Sides</th>
+                <th scope="col">Total</th>
+                <th scope="col">Average</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </section>
+        <section class="supabase-panel" role="tabpanel" aria-labelledby="supabase-tab-trends" data-tab-panel="trends" hidden>
+          <div class="supabase-trend-controls" role="group" aria-label="Trend metric">
+            <button type="button" class="trend-toggle is-active" data-trend-metric="total" aria-pressed="true">Totals</button>
+            <button type="button" class="trend-toggle" data-trend-metric="average" aria-pressed="false">Averages</button>
+          </div>
+          <div id="supabase-trend-state" class="supabase-history-state">Enable sync and sign in from the settings page to view charts of your saved rolls.</div>
+          <div class="supabase-trend-canvas" hidden>
+            <canvas id="supabase-trend-chart" aria-label="Supabase roll trends" role="img"></canvas>
+          </div>
+        </section>
+      </div>
+    </section>
   </main>
 
   <template id="die-tmpl">
@@ -51,6 +97,6 @@
     </div>
   </template>
 
-  <script src="script.js"></script>
+  <script type="module" src="roller.js"></script>
 </body>
 </html>
