@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Past Saved Data - Dice Roller</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <header class="top">
+      <div class="top-bar">
+        <h1>Past Saved Data</h1>
+      </div>
+      <div class="top-actions">
+        <p id="supabase-status" class="supabase-status supabase-status--header" role="status" aria-live="polite">Supabase sync is disabled. Configure settings to enable sync.</p>
+        <nav class="page-nav" aria-label="Page navigation">
+          <a class="link-button" href="index.html">Roll Dice</a>
+          <a class="link-button" href="history.html" aria-current="page">Past Saved Data</a>
+          <a class="link-button" href="trends.html">View Trends</a>
+          <a class="link-button" href="settings.html">Supabase Settings</a>
+        </nav>
+      </div>
+    </header>
+
+    <section class="supabase" aria-labelledby="history-heading">
+      <div class="supabase-header">
+        <h2 id="history-heading">Supabase History</h2>
+        <p class="supabase-help">View the rolls saved to your Supabase table. Sign in from the settings page to see your personal data.</p>
+      </div>
+      <div id="supabase-history-state" class="supabase-history-state">Enable sync and sign in from the settings page to view your saved rolls.</div>
+      <table id="supabase-remote-history" class="supabase-remote-history" hidden>
+        <thead>
+          <tr>
+            <th scope="col">Date</th>
+            <th scope="col">Timestamp</th>
+            <th scope="col">Dice Count</th>
+            <th scope="col">Sides</th>
+            <th scope="col">Total</th>
+            <th scope="col">Average</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script type="module" src="history.js"></script>
+</body>
+</html>
